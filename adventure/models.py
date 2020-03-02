@@ -7,39 +7,9 @@ import uuid
 
 
 class Room(models.Model):
-    title = models.CharField(max_length=50, default="DEFAULT TITLE")
-    description = models.CharField(
-        max_length=500, default="DEFAULT DESCRIPTION")
-    n_to = models.IntegerField(default=0)
-    s_to = models.IntegerField(default=0)
-    e_to = models.IntegerField(default=0)
-    w_to = models.IntegerField(default=0)
-
-    def connect_rooms(self, destination_room, direction):
-        destination_room_id = destination_room.id
-        try:
-            destination_room = Room.objects.get(id=destination_room_id)
-        except Room.DoesNotExist:
-            print("That room does not exist")
-        else:
-            if direction == "n":
-                self.n_to = destination_room_id
-            elif direction == "s":
-                self.s_to = destination_room_id
-            elif direction == "e":
-                self.e_to = destination_room_id
-            elif direction == "w":
-                self.w_to = destination_room_id
-            else:
-                print("Invalid direction")
-                return
-            self.save()
-
-    def player_names(self, current_player_id):
-        return [p.user.username for p in Player.objects.filter(current_room=self.id) if p.id != int(current_player_id)]
-
-    def player_uuids(self, current_player_id):
-        return [p.uuid for p in Player.objects.filter(current_room=self.id) if p.id != int(current_player_id)]
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
+    maze = models.IntegerField(default=0)
 
 
 class Player(models.Model):
