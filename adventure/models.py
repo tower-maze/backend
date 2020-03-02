@@ -39,10 +39,12 @@ class Maze(models.Model):
         while len(maze_stack):
             pass
             # pick a random, available direction
+            room = maze_stack.check()
+            available = room.get_available_rooms()
             # add next room to stack
             # move to next room
             # repeat until no more available directions 
-                # (edge of map or already has 2 connections)
+                # (edge of map or already has connections)
             # pop from stack until you have available directions
             # repeat until stack is empty
 
@@ -71,6 +73,31 @@ class Room(models.Model):
             room.east_connection = True
         self.save()
         room.save()
+
+    def count_connections(self):
+        count = 0
+        count += self.north_connection
+        count += self.east_connection
+        count += self.south_connection
+        count += self.west_connection
+        return count
+
+    def get_available_rooms(self):
+        rooms = [self.get_room_north(), self.get_room_east(),
+                 self.get_room_south(), self.get_room_west()]
+        return filter(lambda room: room.count_connectons() == 0, rooms)
+
+    def get_room_north(self):
+        return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
+
+    def get_room_east(self):
+        return Room.objects.get(maze=self.maze, x=self.x+1, y=self.y)
+
+    def get_room_south(self):
+        return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
+
+    def get_room_west(self):
+        return Room.objects.get(maze=self.maze, x=self.x-1, y=self.y)
 
 
 class Player(models.Model):
