@@ -5,10 +5,17 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 import uuid
 
+class Maze(models.Model):
+    title = models.CharField(max_length=127)
+
 
 class Room(models.Model):
     x = models.IntegerField(default=0)
     y = models.IntegerField(default=0)
+    north_connection = models.BooleanField(default=False)
+    east_connection = models.BooleanField(default=False)
+    south_connection = models.BooleanField(default=False)
+    west_connection = models.BooleanField(default=False)
     maze = models.IntegerField(default=0)
 
 
