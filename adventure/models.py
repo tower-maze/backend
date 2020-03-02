@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 import uuid
 import random
 
-from ..util.stack import Stack
+from util.stack import Stack
 
 class Maze(models.Model):
     title = models.CharField(max_length=127)
