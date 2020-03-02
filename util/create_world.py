@@ -5,7 +5,7 @@ from adventure.models import Player, Room
 Room.objects.all().delete()
 
 r_outside = Room(title="Outside Cave Entrance",
-               description="North of you, the cave mount beckons")
+                 description="North of you, the cave mount beckons")
 
 r_foyer = Room(title="Foyer", description="""Dim light filters in from the south. Dusty
 passages run north and east.""")
@@ -28,20 +28,19 @@ r_narrow.save()
 r_treasure.save()
 
 # Link rooms together
-r_outside.connectRooms(r_foyer, "n")
-r_foyer.connectRooms(r_outside, "s")
+r_outside.connectRooms(r_foyer, "y"-1)
+r_foyer.connectRooms(r_outside, "y"+1)
 
-r_foyer.connectRooms(r_overlook, "n")
-r_overlook.connectRooms(r_foyer, "s")
+r_foyer.connectRooms(r_overlook, "y"-1)
+r_overlook.connectRooms(r_foyer, "y"+1)
 
-r_foyer.connectRooms(r_narrow, "e")
-r_narrow.connectRooms(r_foyer, "w")
+r_foyer.connectRooms(r_narrow, "x"+1)
+r_narrow.connectRooms(r_foyer, "x"-1)
 
-r_narrow.connectRooms(r_treasure, "n")
-r_treasure.connectRooms(r_narrow, "s")
+r_narrow.connectRooms(r_treasure, "y"-1)
+r_treasure.connectRooms(r_narrow, "y"+1)
 
-players=Player.objects.all()
+players = Player.objects.all()
 for p in players:
-  p.currentRoom=r_outside.id
-  p.save()
-
+    p.currentRoom = r_outside.id
+    p.save()
