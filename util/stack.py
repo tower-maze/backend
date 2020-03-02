@@ -36,6 +36,9 @@ class Stack:
     def __len__(self):
         return len(self.storage)
 
+    def check(self):
+        return self.storage.head.value
+
     def push(self, value):
         self.storage.add_to_head(value)
 
