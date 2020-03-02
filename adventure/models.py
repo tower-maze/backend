@@ -36,17 +36,19 @@ class Maze(models.Model):
         maze_exit = random.choice(rooms[0]) # top row
         maze_stack = Stack()
         maze_stack.push(maze_start)
+        # repeat until stack is empty
         while len(maze_stack):
-            pass
+            room = maze_stack.get_head()
             # pick a random, available direction
-            room = maze_stack.check()
-            available = room.get_available_rooms()
-            # add next room to stack
-            # move to next room
-            # repeat until no more available directions 
-                # (edge of map or already has connections)
-            # pop from stack until you have available directions
-            # repeat until stack is empty
+            available_rooms = room.get_available_rooms()
+            if available_rooms:
+                next_room = random.choice(available_rooms)
+                # connect and add next room to stack
+                room.connect(next_room)
+                maze_stack.push(next_room)
+            # if dead end, go back through stack
+            else:
+                maze_stack.pop()
 
 
 class Room(models.Model):
