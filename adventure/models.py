@@ -8,6 +8,15 @@ import uuid
 class Maze(models.Model):
     title = models.CharField(max_length=127)
 
+    def initialize(self):
+        rooms = Room.objects.filter(maze=self.id)
+        # return grid [
+        #                 [Room(x=0,y=0), Room(x=1,y=0), ...],
+        #                 [Room(x=0,y=1), Room(x=1,y=1), ...],
+        #                 ...
+        #             ]
+        return [[rooms[i] for i in range(j*32, (j+1)*32)] for j in range(32)]
+
 
 class Room(models.Model):
     x = models.IntegerField(default=0)
