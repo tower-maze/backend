@@ -27,38 +27,37 @@ def initialize(request):
 # @csrf_exempt
 @api_view(["POST"])
 def move(request):
-    dirs = {"y"-1: "north", "y"+1: "south", "x"+1: "east", "x"-1: "west"}
-    reverse_dirs = {"y"-1: "south", "y"+1: "north",
-                    "x"+1: "west", "x"-1: "east"}
+    dirs = {"n": "north", "s": "south", "e": "east", "w": "west"}
+    reverse_dirs = {"n": "south", "s": "north", "e": "west", "w": "east"}
     player = request.user.player
     player_id = player.id
     player_uuid = player.uuid
     data = json.loads(request.body)
     direction = data['direction']
     room = player.room()
-    nextRoomID = None
-    if direction == "y"-1:
-        nextRoomID = room.n_to
-    elif direction == "y"+1:
-        nextRoomID = room.s_to
-    elif direction == "x"+1:
-        nextRoomID = room.e_to
-    elif direction == "x"-1:
-        nextRoomID = room.w_to
-    if nextRoomID is not None and nextRoomID > 0:
-        nextRoom = Room.objects.get(id=nextRoomID)
-        player.currentRoom = nextRoomID
+    next_room_id = None
+    if direction == "n":
+        next_room_id = room.n_to
+    elif direction == "s":
+        next_room_id = room.s_to
+    elif direction == "e":
+        next_room_id = room.e_to
+    elif direction == "w":
+        next_room_id = room.w_to
+    if next_room_id is not None and next_room_id > 0:
+        next_room = Room.objects.get(id=next_room_id)
+        player.current_room = next_room_id
         player.save()
-        players = nextRoom.playerNames(player_id)
-        currentPlayerUUIDs = room.playerUUIDs(player_id)
-        nextPlayerUUIDs = nextRoom.playerUUIDs(player_id)
-        # for p_uuid in currentPlayerUUIDs:
+        players = next_room.player_names(player_id)
+        current_player_uuids = room.player_uuids(player_id)
+        next_player_uuids = next_room.player_uuids(player_id)
+        # for p_uuid in current_player_uuids:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
-        # for p_uuid in nextPlayerUUIDs:
+        # for p_uuid in next_player_uuids:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'x_coordinates': 'Something', 'y_coordinates': 'Something', 'error_msg': 'Generic Error Message'}, safe=True)
+        return JsonResponse({'name': player.user.username, 'title': next_room.title, 'description': next_room.description, 'players': players, 'error_msg': ""}, safe=True)
     else:
-        players = room.playerNames(player_id)
+        players = room.player_names(player_id)
         return JsonResponse({'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players, 'error_msg': "You cannot move that way."}, safe=True)
 
 
