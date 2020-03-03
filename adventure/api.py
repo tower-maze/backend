@@ -13,7 +13,7 @@ import json
 
 
 @csrf_exempt
-@api_view(["GET"])
+@api_view(['GET'])
 def initialize(request):
     user = request.user
     player = user.player
@@ -21,24 +21,27 @@ def initialize(request):
     uuid = player.uuid
     room = player.room()
     # players = room.playerNames(player_id)
-    return JsonResponse({"x": room.x, "y": room.y, "maze": room.maze}, safe=True)
+    return JsonResponse({'x': room.x, 'y': room.y, 'maze': room.maze}, safe=True)
 
 
 # @csrf_exempt
-@api_view(["POST"])
+@api_view(['POST'])
 def move(request):
-    player = request.user.player
-    data = json.loads(request.body)
+    data = request.data
     direction = data['direction']
-    new_room = player.move(direction)
-    return JsonResponse({'x': new_room.x, 'y': new_room.y})
+    player = request.user.player
+    try:
+        new_room = player.move(direction)
+        return JsonResponse({'x': new_room.x, 'y': new_room.y})
+    except:
+        return JsonResponse({'message': 'Invalid Direction'}, status=400)
 
 
 @csrf_exempt
-@api_view(["POST"])
+@api_view(['POST'])
 def say(request):
     # IMPLEMENT
-    return JsonResponse({'error': "Not yet implemented"}, safe=True, status=500)
+    return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)
 
 
 # @csrf_exempt

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404
 from rest_framework.authtoken.models import Token
 from util.stack import Stack
 import uuid
@@ -99,7 +98,7 @@ class Room(models.Model):
 
     def get_room_north(self):
         try:
-            return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
         except Room.DoesNotExist:
             return None
 
@@ -111,7 +110,7 @@ class Room(models.Model):
 
     def get_room_south(self):
         try:
-            return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
         except Room.DoesNotExist:
             return None
 
@@ -128,9 +127,8 @@ class Player(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def initialize(self):
-        if self.current_room == 0:
-            self.current_room = Room.objects.first().id
-            self.save()
+        self.current_room = Room.objects.first().id
+        self.save()
 
     def room(self):
         try:
@@ -154,7 +152,7 @@ class Player(models.Model):
         elif direction == 'w' and room.west_connection:
             new_room = room.get_room_west()
         else:
-            raise Http404('Invalid Direction')
+            raise Exception('Invalid Direction')
         self.set_room(new_room)
         return new_room
 
