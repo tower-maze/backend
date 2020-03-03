@@ -24,7 +24,15 @@ def initialize(request):
     return JsonResponse({"x": room.x, "y": room.y, "maze": room.maze}, safe=True)
 
 
-# @csrf_exempt
+@csrf_exempt
+@api_view(["GET"])
+def get_maze(request):
+    maze = request.user.player.maze()
+    rooms = maze.rooms()
+    return JsonResponse({"title": maze.title, "rooms": rooms}, safe=True)
+
+
+@csrf_exempt
 @api_view(["POST"])
 def move(request):
     dirs = {"n": "north", "s": "south", "e": "east", "w": "west"}

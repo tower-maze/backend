@@ -20,6 +20,7 @@ class Maze(models.Model):
         # ]
         if not self.id:
             self.save()
+
         rooms = Room.objects.filter(maze=self.id)
         if len(rooms) != 32*32:
             for y in range(32):
@@ -29,8 +30,12 @@ class Maze(models.Model):
                     room.y = y
                     room.maze = self.id
                     room.save()
-            rooms = Room.objects.filter(maze=self.id)
-        return [[rooms[i] for i in range(j*32, (j+1)*32)] for j in range(32)]
+
+        return self.rooms()
+
+    def rooms(self):
+        rooms = Room.objects.filter(maze=self.id)
+        return [[rooms[i].serialize() for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
         rooms = self.initialize()
@@ -61,6 +66,16 @@ class Room(models.Model):
     south_connection = models.BooleanField(default=False)
     west_connection = models.BooleanField(default=False)
     maze = models.IntegerField(default=0)
+
+    def serialize(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "north": self.north_connection,
+            "east": self.east_connection,
+            "south": self.south_connection,
+            "west": self.west_connection
+        }
 
     def connect(self, room):
         if self.y < room.y:
@@ -127,9 +142,8 @@ class Player(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def initialize(self):
-        if self.current_room == 0:
-            self.current_room = Room.objects.first().id
-            self.save()
+        self.current_room = Room.objects.first().id
+        self.save()
 
     def room(self):
         try:
@@ -137,6 +151,14 @@ class Player(models.Model):
         except Room.DoesNotExist:
             self.initialize()
             return self.room()
+
+    def maze(self):
+        try:
+            room = self.room()
+            return Maze.objects.get(id=room.maze)
+        except Maze.DoesNotExist:
+            self.initialize()
+            return self.maze()
 
 
 @receiver(post_save, sender=User)
