@@ -12,6 +12,27 @@ class Room(models.Model):
     maze = models.IntegerField(default=0)
 
 
+def connectRooms(self, upcomingRoom, direction):
+    upcomingRoomID = upcomingRoom.id
+    try:
+        upcomingRoom = Room.objects.get(id=upcomingRoomID)
+    except Room.DoesNotExist:
+        print("You have reached a dead-end")
+    else:
+        if direction == "y"-1:
+            self.n_to = upcomingRoomID
+        elif direction == "y"+1:
+            self.s_to = upcomingRoomID
+        elif direction == "x"+1:
+            self.e_to = upcomingRoomID
+        elif direction == "x"-1:
+            self.w_to = upcomingRoomID
+        else:
+            print("Invalid direction")
+            return
+        self.save()
+
+
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     currentRoom = models.IntegerField(default=0)
@@ -19,7 +40,7 @@ class Player(models.Model):
 
     def initialize(self):
         if self.currentRoom == 0:
-            self.currentRoom = Room.objects.first().id
+            self.currentRoom = player.currentRoom = upcomingRoomID
             self.save()
 
     def room(self):

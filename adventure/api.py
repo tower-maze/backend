@@ -56,7 +56,7 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'x_coordinates': 'Something', 'y_coordinates': 'Something', 'error_msg': 'Generic Error Message'}, safe=True)
+        return JsonResponse({'x_coordinates': 'Something', 'y_coordinates': 'Something', 'error_msg': 'Oops! That didnt work, please try again...'}, safe=True)
     else:
         players = room.playerNames(player_id)
         return JsonResponse({'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players, 'error_msg': "You cannot move that way."}, safe=True)
@@ -67,3 +67,21 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error': "Not yet implemented"}, safe=True, status=500)
+
+
+# @csrf_exempt
+# @api_view(["GET"])
+# def rooms(request):
+#     user = request.user
+#     player = user.player
+#     player_id = player.id
+#     return JsonResponse([{
+#         'room_id': index,
+#         'north': room.y-1_to != 0,
+#         'south': room.y+1_to != 0,
+#         'east': room.x+1_to != 0,
+#         'west': room.x-1_to != 0,
+#         'title': room.title,
+#         'description': room.description,
+#         'players': room.allPlayerNames()
+#     } for index, room in enumerate(Room.objects.all())], safe=False)
