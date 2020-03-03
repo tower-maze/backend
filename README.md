@@ -6,7 +6,7 @@ You should treat this like a real-world job assignment with your instructor as t
 
 [Rubric](https://www.notion.so/lambdaschool/62cd3df0537c4a5b89b9a5e26587adb6?v=e07127d43d764611888981d5d464dba6)
 
-### What is a MUD?
+### What is a MUD
 
 > A MUD...is a multiplayer real-time virtual world, usually text-based. MUDs combine elements of role-playing games, hack and slash, player versus player, interactive fiction, and online chat. Players can read or view descriptions of rooms, objects, other players, non-player characters, and actions performed in the virtual world. Players typically interact with each other and the world by typing commands that resemble a natural language. - Wikipedia
 
@@ -37,11 +37,15 @@ You may find these resources useful:
 
 - Use the [sprint challenge instructions for Intro to Django](https://github.com/LambdaSchool/Sprint-Challenge--Django-I).
 - Add environment variables to heroku using `heroku config:set KEY=VALUE`
+
   - It is recommended that if you are having trouble (e.g. 500 server errors) to set
+
     ```
     DEBUG=TRUE
     ```
+
     to get more information.
+
 - Run the code in create_world.py on your heroku server (`heroku run python manage.py shell`)
 
 You can consider Pusher websocket integration to be a stretch goal. Your server should interact with your team's client.
@@ -72,7 +76,7 @@ Once your backend is up and running, you should be able to swap out the test hos
 
 Your backend should implement a `rooms` endpoint which will return data for every room in your world. Your job will be to build a map to display a map of those rooms, along with relevant information, like marking which room the player is currently in.
 
-#### 4. STRETCH: Implement client "hearing" (Brady walks in from the north) and chat using the Pusher websocket library.
+#### 4. STRETCH: Implement client "hearing" (Brady walks in from the north) and chat using the Pusher websocket library
 
 More on Pusher below.
 
@@ -103,7 +107,7 @@ These are implemented on the test server: `https://lambda-mud-test.herokuapp.com
 ### Move
 
 - Request: (Replace token string with logged in user's auth token)
-  - `curl -X POST -H 'Authorization: Token 6b7b9d0f33bd76e75b0a52433f268d3037e42e66' -H "Content-Type: application/json" -d '{"direction":"y"-1}' localhost:8000/api/adv/move/`
+  - `curl -X POST -H 'Authorization: Token 6b7b9d0f33bd76e75b0a52433f268d3037e42e66' -H "Content-Type: application/json" -d '{"direction":"n"}' localhost:8000/api/adv/move/`
 - Response:
   - `{"name": "testuser", "title": "Foyer", "description": "Dim light filters in from the south. Dusty\npassages run north and east.", "players": [], "error_msg": ""}`
 - Pusher broadcast (stretch):
@@ -145,7 +149,8 @@ Note that all the Pusher parts are stretch.
 
   - Create `.env` in the root directory of your project
   - Add your pusher credentials and secret key
-    ```
+
+    ```sh
     SECRET_KEY='<your_secret_key>'
     DEBUG=True
     PUSHER_APP_ID=<your_app_id>
@@ -170,7 +175,7 @@ Note that all the Pusher parts are stretch.
 
 ## FAQs and Troubleshooting
 
-### 1. Can you show me an example of a map visualization?
+### 1. Can you show me an example of a map visualization
 
 Here's a sample project created by [a team in CSPT2](https://confident-wright-ca0176.netlify.com):
 
@@ -184,11 +189,11 @@ And here's an example on iOS:
 
 ![Lambda MUD Mobile](img/ios_lambdamud.jpg)
 
-### 2. How do I build something like that?
+### 2. How do I build something like that
 
 Think about the algorithm to draw your map. It will probably be something like this:
 
-```
+```sh
 def draw_map():
     # Get all rooms
     # For each room in rooms...
@@ -198,18 +203,18 @@ def draw_map():
 
 What data do you need to implement this? A list of rooms, their exits, maybe their positions? The server should return all the information you need from the `rooms` endpoint. Note that backend developers may need to define some fields in the `Room` model that do not exist yet.
 
-### 3. How do I "create an interesting world"?
+### 3. How do I "create an interesting world"
 
 I'll leave that to you to determine.
 
-### 4. What is Pusher?
+### 4. What is Pusher
 
 Pusher is a cross-platform websocket library. This will allow you to turn your app into a real MUD with live push notifications to your client. You can consider integration to be a stretch goal but it's worth the effort if you have the time: websockets are powerful!
 
-### 5. What will the `rooms` API endpoint look like?
+### 5. What will the `rooms` API endpoint look like
 
 It's up to you what data the request will return but the API request should be something like this:
 
-```
+```sh
 curl -X GET -H 'Authorization: Token cc504e88ef659843b858d61c101ca9d4f0edf979' http://lambda-mud-test.herokuapp.com/api/adv/rooms/
 ```
