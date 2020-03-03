@@ -8,6 +8,7 @@ import random
 
 from util.stack import Stack
 
+
 class Maze(models.Model):
     title = models.CharField(max_length=127, default="Default Title")
 
@@ -34,8 +35,8 @@ class Maze(models.Model):
 
     def generate_connections(self):
         rooms = self.initialize()
-        maze_start = random.choice(rooms[31]) # bottom row
-        maze_exit = random.choice(rooms[0]) # top row
+        maze_start = random.choice(rooms[31])  # bottom row
+        maze_exit = random.choice(rooms[0])  # top row
         maze_stack = Stack()
         maze_stack.push(maze_start)
         # repeat until stack is empty
@@ -89,6 +90,7 @@ class Room(models.Model):
     def get_available_rooms(self):
         rooms = [self.get_room_north(), self.get_room_east(),
                  self.get_room_south(), self.get_room_west()]
+
         def is_available(room):
             if room:
                 return room.count_connections() == 0
