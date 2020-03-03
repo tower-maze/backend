@@ -2,9 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.http import Http404
 from rest_framework.authtoken.models import Token
 import uuid
 import random
+
 
 from util.stack import Stack
 
@@ -138,6 +140,25 @@ class Player(models.Model):
         except Room.DoesNotExist:
             self.initialize()
             return self.room()
+
+    def set_room(self, room):
+        self.current_room = room.id
+        self.save()
+
+    def move(self, direction):
+        room = self.room()
+        if direction == 'n' and room.north_connection:
+            new_room = room.get_room_north()
+        elif direction == 's' and room.south_connection:
+            new_room = room.get_room_south()
+        elif direction == 'e' and room.east_connection:
+            new_room = room.get_room_east()
+        elif direction == 'w' and room.west_connection:
+            new_room = room.get_room_west()
+        else:
+            raise Http404('Invalid Direction')
+        self.set_room(new_room)
+        return new_room
 
 
 @receiver(post_save, sender=User)
