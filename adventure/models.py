@@ -9,7 +9,7 @@ import random
 from util.stack import Stack
 
 class Maze(models.Model):
-    title = models.CharField(max_length=127)
+    title = models.CharField(max_length=127, default="Default Title")
 
     def initialize(self):
         """returns 2D array grid of maze rooms, creating them if missing"""
@@ -18,6 +18,8 @@ class Maze(models.Model):
         #     [Room(x=0,y=1), Room(x=1,y=1), ...],
         #     ...
         # ]
+        if not self.id:
+            self.save()
         rooms = Room.objects.filter(maze=self.id)
         if len(rooms) != 32*32:
             for y in range(32):
@@ -28,6 +30,7 @@ class Maze(models.Model):
                     room.maze = self.id
                     room.save()
             rooms = Room.objects.filter(maze=self.id)
+        assert(True, False)
         return [[rooms[i] for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
@@ -38,10 +41,11 @@ class Maze(models.Model):
         maze_stack.push(maze_start)
         # repeat until stack is empty
         while len(maze_stack):
+            # assert(True, False)
             room = maze_stack.get_head()
             # pick a random, available direction
             available_rooms = room.get_available_rooms()
-            if available_rooms:
+            if len(available_rooms):
                 next_room = random.choice(available_rooms)
                 # connect and add next room to stack
                 room.connect(next_room)
@@ -87,19 +91,31 @@ class Room(models.Model):
     def get_available_rooms(self):
         rooms = [self.get_room_north(), self.get_room_east(),
                  self.get_room_south(), self.get_room_west()]
-        return filter(lambda room: room.count_connectons() == 0, rooms)
+        return filter(lambda room: room and room.count_connectons() == 0, rooms)
 
     def get_room_north(self):
-        return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
+        try:
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
+        except Room.DoesNotExist:
+            return None
 
     def get_room_east(self):
-        return Room.objects.get(maze=self.maze, x=self.x+1, y=self.y)
+        try:
+            return Room.objects.get(maze=self.maze, x=self.x+1, y=self.y)
+        except Room.DoesNotExist:
+            return None
 
     def get_room_south(self):
-        return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
+        try:
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
+        except Room.DoesNotExist:
+            return None
 
     def get_room_west(self):
-        return Room.objects.get(maze=self.maze, x=self.x-1, y=self.y)
+        try:
+            return Room.objects.get(maze=self.maze, x=self.x-1, y=self.y)
+        except Room.DoesNotExist:
+            return None
 
 
 class Player(models.Model):
