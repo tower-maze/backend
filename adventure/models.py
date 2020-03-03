@@ -4,11 +4,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404
 from rest_framework.authtoken.models import Token
+from util.stack import Stack
 import uuid
 import random
-
-
-from util.stack import Stack
 
 
 class Maze(models.Model):
