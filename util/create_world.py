@@ -4,14 +4,14 @@ from adventure.models import Player, Room, Maze
 Maze.objects.all().delete()
 Room.objects.all().delete()
 
-for i in range(1,10):
+for i in range(1, 10):
     maze = Maze()
     maze.generate_connections()
     maze.title = f"Floor {i}"
     maze.save()
 
 
-# players = Player.objects.all()
-# for p in players:
-#     p.current_room = r_outside.id
-#     p.save()
+players = Player.objects.all()
+for player in players:
+    player.current_room = Room.objects.first().id
+    player.save()
