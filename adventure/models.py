@@ -3,10 +3,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from util.stack import Stack
 import uuid
 import random
-
-from util.stack import Stack
 
 
 class Maze(models.Model):
@@ -120,7 +119,6 @@ class Room(models.Model):
             return Room.objects.get(maze=self.maze, x=self.x-1, y=self.y)
         except Room.DoesNotExist:
             return None
-
 
 
 class Player(models.Model):
