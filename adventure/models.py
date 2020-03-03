@@ -122,6 +122,7 @@ class Room(models.Model):
             return None
 
 
+
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     current_room = models.IntegerField(default=0)
