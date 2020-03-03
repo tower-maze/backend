@@ -19,7 +19,7 @@ class LinkedList:
             self.head = Node(value)
         self.length += 1
 
-    def remove_from_head(self, value):
+    def remove_from_head(self):
         if self.head:
             return_value = self.head.value
             self.head = self.head.next_node

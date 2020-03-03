@@ -30,7 +30,6 @@ class Maze(models.Model):
                     room.maze = self.id
                     room.save()
             rooms = Room.objects.filter(maze=self.id)
-        assert(True, False)
         return [[rooms[i] for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
@@ -41,7 +40,6 @@ class Maze(models.Model):
         maze_stack.push(maze_start)
         # repeat until stack is empty
         while len(maze_stack):
-            # assert(True, False)
             room = maze_stack.get_head()
             # pick a random, available direction
             available_rooms = room.get_available_rooms()
@@ -91,7 +89,11 @@ class Room(models.Model):
     def get_available_rooms(self):
         rooms = [self.get_room_north(), self.get_room_east(),
                  self.get_room_south(), self.get_room_west()]
-        return filter(lambda room: room and room.count_connectons() == 0, rooms)
+        def is_available(room):
+            if room:
+                return room.count_connections() == 0
+            return False
+        return [*filter(is_available, rooms)]
 
     def get_room_north(self):
         try:
