@@ -28,7 +28,7 @@ def initialize(request):
 @api_view(['GET'])
 def get_maze(request):
     maze = request.user.player.maze()
-    rooms = maze.rooms()
+    rooms = maze.rooms(callback=lambda room: dict(room))
     return JsonResponse({"title": maze.title, "rooms": rooms}, safe=True)
 
 

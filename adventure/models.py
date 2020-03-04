@@ -31,12 +31,11 @@ class Maze(models.Model):
                     room.maze = self.id
                     room.save()
 
-        return self.rooms(serialize=False)
+        return self.rooms()
 
-    def rooms(self, serialize=True):
+    def rooms(self, callback=lambda room: room):
         rooms = Room.objects.filter(maze=self.id)
-        def room(i): return rooms[i].serialize() if serialize else rooms[i]
-        return [[room(i) for i in range(j*32, (j+1)*32)] for j in range(32)]
+        return [[callback(rooms[i]) for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
         rooms = self.initialize()
@@ -68,13 +67,11 @@ class Room(models.Model):
     west_connection = models.BooleanField(default=False)
     maze = models.IntegerField(default=0)
 
-    def serialize(self):
-        return {
-            "n": int(self.north_connection),
-            "e": int(self.east_connection),
-            "s": int(self.south_connection),
-            "w": int(self.west_connection)
-        }
+    def __iter__(self):
+        yield 'n', int(self.north_connection)
+        yield 'e', int(self.east_connection)
+        yield 's', int(self.south_connection)
+        yield 'w', int(self.west_connection)
 
     def connect(self, room):
         if self.y < room.y:
