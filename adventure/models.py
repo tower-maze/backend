@@ -171,6 +171,10 @@ class Player(models.Model):
         if self.current_room == self.current_maze.exit_room:
             self.current_maze += 1
             self.current_room = self.maze().start_room
+        elif self.current_room == self.current_maze.start_room:
+            if self.current_maze != Maze.objects.first().id:
+                self.current_maze -= 1
+                self.current_room = self.maze().exit_room
         self.save()
 
     def move(self, direction):
