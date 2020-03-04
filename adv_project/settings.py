@@ -129,15 +129,14 @@ REST_FRAMEWORK = {
     ),
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'https://tower-maze.netlify.com'
-]
-
-SESSION_COOKIE_SAMESITE = None
-CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_SAMESITE = None
 CRSF_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = None
+
+CORS_ORIGIN_WHITELIST = ['https://tower-maze.netlify.com']
+CSRF_TRUSTED_ORIGINS = ['https://tower-maze.netlify.com']
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
