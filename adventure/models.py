@@ -50,7 +50,7 @@ class Maze(models.Model):
             while len(maze_stack):
                 room = maze_stack.get_head()
                 # pick a random, available direction
-                available_rooms = room.get_available_rooms(self.rooms)
+                available_rooms = room.get_available_rooms()
                 if len(available_rooms):
                     if self.seed:
                         index = self.seed[i]
@@ -70,17 +70,17 @@ class Maze(models.Model):
                 self.seed = seed
             self.save()
 
-        def get_room(self, x, y):
-            if not self.rooms:
-                self.initialize()
-            try:
-                return self.rooms[y][x]
-            except IndexError:
-                return None
+    def get_room(self, x, y):
+        if not self.rooms:
+            self.initialize()
+        try:
+            return self.rooms[y][x]
+        except IndexError:
+            return None
 
-        def get_room_by_id(self, room_id):
-            x, y = room_id
-            return self.get_room(x, y)
+    def get_room_by_id(self, room_id):
+        x, y = room_id
+        return self.get_room(x, y)
 
 class Room():
     north_connection = 0
@@ -132,13 +132,13 @@ class Room():
     def get_room_north(self):
         return self.maze.get_room(self.x, self.y-1)
 
-    def get_room_east(self, rooms):
+    def get_room_east(self):
         return self.maze.get_room(self.x+1, self.y)
 
-    def get_room_south(self, rooms):
+    def get_room_south(self):
         return self.maze.get_room(self.x, self.y+1)
 
-    def get_room_west(self, rooms):
+    def get_room_west(self):
         return self.maze.get_room(self.x-1, self.y)
 
 
@@ -157,7 +157,7 @@ class Player(models.Model):
     def room(self):
         maze = Maze.objects.get(id=self.current_maze)
         if maze:
-            room = maze.get_room(self.current_room)
+            room = maze.get_room_by_id(self.current_room)
         if room:
             return room
         else:
