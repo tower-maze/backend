@@ -130,6 +130,7 @@ REST_FRAMEWORK = {
 
 # Uncomment when Django adds support for explicit none samesite cookies.
 # SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = None
 
 CORS_ORIGIN_WHITELIST = ['https://tower-maze.netlify.com']
 CORS_ALLOW_CREDENTIALS = True
