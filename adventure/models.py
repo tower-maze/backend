@@ -123,13 +123,15 @@ class Room(models.Model):
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    current_maze = models.IntegerField(default=0)
     current_room = models.IntegerField(default=0)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def initialize(self):
-        self.current_room = Room.objects.first().id
+        self.current_maze = Maze.objects.first().id
+        self.current_room = Room.objects.filter(maze=self.current_maze).first().id
         self.save()
-
+    
     def room(self):
         try:
             return Room.objects.get(id=self.current_room)
@@ -155,6 +157,17 @@ class Player(models.Model):
             raise Exception('Invalid Direction')
         self.set_room(new_room)
         return new_room
+    
+    def see_others(self):
+        maze = self.room().maze
+        players = Player.objects.filter(maze=maze.id)
+        player_positions = []
+        
+        for player in players:
+            position = ('x': player.room.x, 'y': player.room.y)
+            player_positions.append(position)
+        
+        return player_positions
 
 
 @receiver(post_save, sender=User)
