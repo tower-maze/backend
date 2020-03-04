@@ -59,7 +59,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -124,12 +123,18 @@ REST_FRAMEWORK = {
     # ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'util.csrf_exempt.CsrfExemptSessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
+# Uncomment when Django adds support for explicit none samesite cookies.
+# SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = None
+
+CORS_ORIGIN_WHITELIST = ['https://tower-maze.netlify.com']
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
