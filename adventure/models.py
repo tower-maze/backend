@@ -10,6 +10,8 @@ import random
 
 class Maze(models.Model):
     title = models.CharField(max_length=127, default="Default Title")
+    start_room = models.IntegerField(default=0)
+    exit_room = models.IntegerField(default=0)
 
     def initialize(self):
         """returns 2D array grid of maze rooms, creating them if missing"""
@@ -20,6 +22,7 @@ class Maze(models.Model):
         # ]
         if not self.id:
             self.save()
+
         rooms = Room.objects.filter(maze=self.id)
         if len(rooms) != 32*32:
             for y in range(32):
@@ -29,13 +32,21 @@ class Maze(models.Model):
                     room.y = y
                     room.maze = self.id
                     room.save()
-            rooms = Room.objects.filter(maze=self.id)
-        return [[rooms[i] for i in range(j*32, (j+1)*32)] for j in range(32)]
+
+        return self.rooms()
+
+    def rooms(self, callback=lambda room: room):
+        rooms = Room.objects.filter(maze=self.id)
+        return [[callback(rooms[i]) for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
         rooms = self.initialize()
         maze_start = random.choice(rooms[31])  # bottom row
         maze_exit = random.choice(rooms[0])  # top row
+
+        self.start_room = maze_start.id
+        self.exit_room = maze_exit.id
+
         maze_stack = Stack()
         maze_stack.push(maze_start)
         # repeat until stack is empty
@@ -61,6 +72,13 @@ class Room(models.Model):
     south_connection = models.BooleanField(default=False)
     west_connection = models.BooleanField(default=False)
     maze = models.IntegerField(default=0)
+
+    def __iter__(self):
+        yield 'id', int(self.id)
+        yield 'n', int(self.north_connection)
+        yield 'e', int(self.east_connection)
+        yield 's', int(self.south_connection)
+        yield 'w', int(self.west_connection)
 
     def connect(self, room):
         if self.y < room.y:
@@ -139,6 +157,14 @@ class Player(models.Model):
         except Room.DoesNotExist:
             self.initialize()
             return self.room()
+
+    def maze(self):
+        try:
+            room = self.room()
+            return Maze.objects.get(id=room.maze)
+        except Maze.DoesNotExist:
+            self.initialize()
+            return self.maze()
 
     def set_room(self, room):
         self.current_room = room.id
