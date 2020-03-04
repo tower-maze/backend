@@ -71,6 +71,7 @@ class Maze(models.Model):
             self.save()
 
     def get_room(self, x, y):
+        """return Room or None"""
         if not self.rooms:
             self.initialize()
         try:
@@ -155,7 +156,11 @@ class Player(models.Model):
         self.save()
 
     def room(self):
-        maze = Maze.objects.get(id=self.current_maze)
+        try:
+            maze = Maze.objects.get(id=self.current_maze)
+        except Maze.DoesNotExist:
+            self.initialize()
+            return self.room()
         if maze:
             room = maze.get_room_by_id(self.current_room)
         if room:
