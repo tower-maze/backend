@@ -66,6 +66,14 @@ class Maze(models.Model):
                 self.seed = seed
             self.save()
 
+    def get_rooms(self, callback=None):
+        if not self.rooms:
+            self.initialize()
+        if not callback:
+            return self.rooms
+        else:
+            return [[callback(room) for room in row] for row in self.rooms]
+
     def get_room(self, x, y):
         """return Room or None"""
         if not self.rooms:
@@ -80,6 +88,7 @@ class Maze(models.Model):
     def get_room_by_id(self, room_id):
         x, y = room_id
         return self.get_room(x, y)
+
 
 class Room():
     north_connection = 0
@@ -102,6 +111,13 @@ class Room():
         if self.south_connection: connections += 's'
         if self.west_connection: connections += 'w'
         return connections
+
+    def __iter__(self):
+        yield 'id', int(self.id)
+        yield 'n', int(self.north_connection)
+        yield 'e', int(self.east_connection)
+        yield 's', int(self.south_connection)
+        yield 'w', int(self.west_connection)
 
     def connect(self, room):
         if self.y > room.y:
@@ -152,6 +168,7 @@ class Room():
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     current_maze = models.IntegerField(default=0)
+<<<<<<< HEAD
     current_room = models.BinaryField(default=bytes((0,0)))
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
@@ -159,6 +176,15 @@ class Player(models.Model):
         first_maze = Maze.objects.first()
         self.current_maze = first_maze.id
         self.current_room = first_maze.start_room
+=======
+    current_room = models.IntegerField(default=0)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    def initialize(self):
+        self.current_maze = Maze.objects.first().id
+        self.current_room = Room.objects.filter(
+            maze=self.current_maze).first().id
+>>>>>>> origin/master
         self.save()
 
     def room(self):
@@ -174,6 +200,14 @@ class Player(models.Model):
         else:
             self.initialize()
             return self.room()
+
+    def maze(self):
+        try:
+            room = self.room()
+            return Maze.objects.get(id=room.maze)
+        except Maze.DoesNotExist:
+            self.initialize()
+            return self.maze()
 
     def set_room(self, room):
         self.current_room = room.id
@@ -193,6 +227,18 @@ class Player(models.Model):
             raise Exception('Invalid Direction')
         self.set_room(new_room)
         return new_room
+
+    def see_others(self):
+        players = Player.objects.filter(current_maze=self.current_maze)
+        players = players.exclude(id=self.id)
+        player_cords = []
+        player_positions = []
+        for player in players:
+            position = {'x': player.room().x, 'y': player.room().y}
+            if not position in player_positions:
+                player_positions.append(position)
+
+        return player_positions
 
 
 @receiver(post_save, sender=User)

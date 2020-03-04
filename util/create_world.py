@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.contrib.auth.models import User
+from django.db import transaction
 from adventure.models import Player, Room, Maze
 
 Maze.objects.all().delete()
