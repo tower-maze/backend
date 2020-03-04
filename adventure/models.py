@@ -69,12 +69,10 @@ class Room(models.Model):
 
     def serialize(self):
         return {
-            "x": self.x,
-            "y": self.y,
-            "north": self.north_connection,
-            "east": self.east_connection,
-            "south": self.south_connection,
-            "west": self.west_connection
+            "n": int(self.north_connection),
+            "e": int(self.east_connection),
+            "s": int(self.south_connection),
+            "w": int(self.west_connection)
         }
 
     def connect(self, room):
