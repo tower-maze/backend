@@ -159,13 +159,13 @@ class Player(models.Model):
         return new_room
     
     def see_others(self):
-        maze = self.room().maze
-        players = Player.objects.filter(maze=maze.id)
+        players = Player.objects.filter(current_maze=self.current_maze).exclude(id = self.id)
+        player_cords = []
         player_positions = []
-        
         for player in players:
-            position = ('x': player.room.x, 'y': player.room.y)
-            player_positions.append(position)
+            position = {'x':player.room().x, 'y':player.room().y}
+            if not position in player_positions:
+                player_positions.append(position)
         
         return player_positions
 
