@@ -28,11 +28,12 @@ def initialize(request):
 @api_view(['GET'])
 def get_maze(request):
     maze = request.user.player.maze()
-    rooms = maze.rooms(callback=lambda room: dict(room))
+    rooms = maze.get_rooms(callback=lambda room: dict(room))
     return JsonResponse({'title': maze.title, 'rooms': rooms, 'startRoom': maze.start_room, 'exitRoom': maze.exit_room}, safe=True)
 
 
 @csrf_exempt
+@api_view(['GET'])
 def other_players(request):
     user = request.user
     player = user.player
@@ -48,7 +49,7 @@ def move(request):
     player = request.user.player
     try:
         new_room = player.move(direction)
-        return JsonResponse({'maze': new_room.maze, 'x': new_room.x, 'y': new_room.y})
+        return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
     except:
         return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 

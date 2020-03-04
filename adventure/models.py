@@ -104,14 +104,6 @@ class Room():
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
-    def __repr__(self):
-        connections = 'R:'
-        if self.north_connection: connections += 'n'
-        if self.east_connection: connections += 'e'
-        if self.south_connection: connections += 's'
-        if self.west_connection: connections += 'w'
-        return connections
-
     def __iter__(self):
         yield 'id', int(self.id)
         yield 'n', int(self.north_connection)
@@ -168,7 +160,6 @@ class Room():
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     current_maze = models.IntegerField(default=0)
-<<<<<<< HEAD
     current_room = models.BinaryField(default=bytes((0,0)))
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
@@ -176,25 +167,11 @@ class Player(models.Model):
         first_maze = Maze.objects.first()
         self.current_maze = first_maze.id
         self.current_room = first_maze.start_room
-=======
-    current_room = models.IntegerField(default=0)
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
-
-    def initialize(self):
-        self.current_maze = Maze.objects.first().id
-        self.current_room = Room.objects.filter(
-            maze=self.current_maze).first().id
->>>>>>> origin/master
         self.save()
 
     def room(self):
-        try:
-            maze = Maze.objects.get(id=self.current_maze)
-        except Maze.DoesNotExist:
-            self.initialize()
-            return self.room()
-        if maze:
-            room = maze.get_room_by_id(self.current_room)
+        maze = self.maze()
+        room = maze.get_room_by_id(self.current_room)
         if room:
             return room
         else:
@@ -203,8 +180,7 @@ class Player(models.Model):
 
     def maze(self):
         try:
-            room = self.room()
-            return Maze.objects.get(id=room.maze)
+            return Maze.objects.get(id=self.current_maze)
         except Maze.DoesNotExist:
             self.initialize()
             return self.maze()
