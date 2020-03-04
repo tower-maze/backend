@@ -105,7 +105,8 @@ class Room():
             setattr(self, key, kwargs[key])
 
     def __iter__(self):
-        yield 'id', int(self.id)
+        yield 'x', int(self.x)
+        yield 'y', int(self.y)
         yield 'n', int(self.north_connection)
         yield 'e', int(self.east_connection)
         yield 's', int(self.south_connection)
