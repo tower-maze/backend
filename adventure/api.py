@@ -13,7 +13,7 @@ import json
 
 
 @csrf_exempt
-@api_view(["GET"])
+@api_view(['GET'])
 def initialize(request):
     user = request.user
     player = user.player
@@ -21,11 +21,11 @@ def initialize(request):
     uuid = player.uuid
     room = player.room()
     # players = room.playerNames(player_id)
-    return JsonResponse({"x": room.x, "y": room.y, "maze": room.maze}, safe=True)
+    return JsonResponse({'x': room.x, 'y': room.y, 'maze': room.maze}, safe=True)
 
 
 @csrf_exempt
-@api_view(["GET"])
+@api_view(['GET'])
 def get_maze(request):
     maze = request.user.player.maze()
     rooms = maze.rooms()
@@ -33,44 +33,20 @@ def get_maze(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
+@api_view(['POST'])
 def move(request):
-    dirs = {"n": "north", "s": "south", "e": "east", "w": "west"}
-    reverse_dirs = {"n": "south", "s": "north", "e": "west", "w": "east"}
-    player = request.user.player
-    player_id = player.id
-    player_uuid = player.uuid
-    data = json.loads(request.body)
+    data = request.data
     direction = data['direction']
-    room = player.room()
-    next_room_id = None
-    if direction == "n":
-        next_room_id = room.n_to
-    elif direction == "s":
-        next_room_id = room.s_to
-    elif direction == "e":
-        next_room_id = room.e_to
-    elif direction == "w":
-        next_room_id = room.w_to
-    if next_room_id is not None and next_room_id > 0:
-        next_room = Room.objects.get(id=next_room_id)
-        player.current_room = next_room_id
-        player.save()
-        players = next_room.player_names(player_id)
-        current_player_uuids = room.player_uuids(player_id)
-        next_player_uuids = next_room.player_uuids(player_id)
-        # for p_uuid in current_player_uuids:
-        #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
-        # for p_uuid in next_player_uuids:
-        #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'name': player.user.username, 'title': next_room.title, 'description': next_room.description, 'players': players, 'error_msg': ""}, safe=True)
-    else:
-        players = room.player_names(player_id)
-        return JsonResponse({'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players, 'error_msg': "You cannot move that way."}, safe=True)
+    player = request.user.player
+    try:
+        new_room = player.move(direction)
+        return JsonResponse({'x': new_room.x, 'y': new_room.y})
+    except:
+        return JsonResponse({'message': 'Invalid Direction'}, status=400)
 
 
 @csrf_exempt
-@api_view(["POST"])
+@api_view(['POST'])
 def say(request):
     # IMPLEMENT
-    return JsonResponse({'error': "Not yet implemented"}, safe=True, status=500)
+    return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)

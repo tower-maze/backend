@@ -1,11 +1,8 @@
 .DS_Store
-.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
 *$py.class
-
 
 # Django stuff:
 *.log
@@ -14,3 +11,4 @@ db.sqlite3
 
 tmp
 .vscode/
+.env

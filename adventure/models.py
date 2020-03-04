@@ -111,7 +111,7 @@ class Room(models.Model):
 
     def get_room_north(self):
         try:
-            return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
         except Room.DoesNotExist:
             return None
 
@@ -123,7 +123,7 @@ class Room(models.Model):
 
     def get_room_south(self):
         try:
-            return Room.objects.get(maze=self.maze, x=self.x, y=self.y+1)
+            return Room.objects.get(maze=self.maze, x=self.x, y=self.y-1)
         except Room.DoesNotExist:
             return None
 
@@ -157,6 +157,25 @@ class Player(models.Model):
         except Maze.DoesNotExist:
             self.initialize()
             return self.maze()
+
+    def set_room(self, room):
+        self.current_room = room.id
+        self.save()
+
+    def move(self, direction):
+        room = self.room()
+        if direction == 'n' and room.north_connection:
+            new_room = room.get_room_north()
+        elif direction == 's' and room.south_connection:
+            new_room = room.get_room_south()
+        elif direction == 'e' and room.east_connection:
+            new_room = room.get_room_east()
+        elif direction == 'w' and room.west_connection:
+            new_room = room.get_room_west()
+        else:
+            raise Exception('Invalid Direction')
+        self.set_room(new_room)
+        return new_room
 
 
 @receiver(post_save, sender=User)
