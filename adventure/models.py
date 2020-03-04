@@ -168,6 +168,9 @@ class Player(models.Model):
 
     def set_room(self, room):
         self.current_room = room.id
+        if self.current_room == self.current_maze.exit_room:
+            self.current_maze += 1
+            self.current_room = self.maze().start_room
         self.save()
 
     def move(self, direction):
@@ -183,7 +186,7 @@ class Player(models.Model):
         else:
             raise Exception('Invalid Direction')
         self.set_room(new_room)
-        return new_room
+        return self.room()
 
     def see_others(self):
         players = Player.objects.filter(current_maze=self.current_maze)
