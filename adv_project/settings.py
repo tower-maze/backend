@@ -132,7 +132,7 @@ REST_FRAMEWORK = {
 CRSF_COOKIE_SAMESITE = None
 SESSION_COOKIE_SAMESITE = None
 
-CORS_ORIGIN_WHITELIST = ['tower-maze.netlify.com']
+CORS_ORIGIN_WHITELIST = ['https://tower-maze.netlify.com']
 CSRF_TRUSTED_ORIGINS = ['tower-maze.netlify.com']
 
 CORS_ALLOW_CREDENTIALS = True
