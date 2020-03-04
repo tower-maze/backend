@@ -20,9 +20,9 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.room()
-    maze = player.room().maze
     # players = room.playerNames(player_id)
     return JsonResponse({'x': room.x, 'y': room.y, 'maze': room.maze}, safe=True)
+
 
 @csrf_exempt
 @api_view(['GET'])
@@ -31,7 +31,6 @@ def other_players(request):
     player = user.player
     others = player.see_others()
     return JsonResponse({'other players': others})
-
 
 
 # @csrf_exempt

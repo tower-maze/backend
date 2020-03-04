@@ -129,9 +129,10 @@ class Player(models.Model):
 
     def initialize(self):
         self.current_maze = Maze.objects.first().id
-        self.current_room = Room.objects.filter(maze=self.current_maze).first().id
+        self.current_room = Room.objects.filter(
+            maze=self.current_maze).first().id
         self.save()
-    
+
     def room(self):
         try:
             return Room.objects.get(id=self.current_room)
@@ -157,16 +158,17 @@ class Player(models.Model):
             raise Exception('Invalid Direction')
         self.set_room(new_room)
         return new_room
-    
+
     def see_others(self):
-        players = Player.objects.filter(current_maze=self.current_maze).exclude(id = self.id)
+        players = Player.objects.filter(current_maze=self.current_maze)
+        players = players.exclude(id=self.id)
         player_cords = []
         player_positions = []
         for player in players:
-            position = {'x':player.room().x, 'y':player.room().y}
+            position = {'x': player.room().x, 'y': player.room().y}
             if not position in player_positions:
                 player_positions.append(position)
-        
+
         return player_positions
 
 
