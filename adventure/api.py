@@ -29,7 +29,7 @@ def initialize(request):
 def get_maze(request):
     maze = request.user.player.maze()
     rooms = maze.rooms(callback=lambda room: dict(room))
-    return JsonResponse({"title": maze.title, "rooms": rooms}, safe=True)
+    return JsonResponse({"title": maze.title, "rooms": rooms, "startRoom": maze.start_room, "exitRoom": maze.exit_room}, safe=True)
 
 
 @csrf_exempt

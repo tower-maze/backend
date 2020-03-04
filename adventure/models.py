@@ -10,6 +10,8 @@ import random
 
 class Maze(models.Model):
     title = models.CharField(max_length=127, default="Default Title")
+    start_room = models.IntegerField(default=0)
+    exit_room = models.IntegerField(default=0)
 
     def initialize(self):
         """returns 2D array grid of maze rooms, creating them if missing"""
@@ -41,6 +43,10 @@ class Maze(models.Model):
         rooms = self.initialize()
         maze_start = random.choice(rooms[31])  # bottom row
         maze_exit = random.choice(rooms[0])  # top row
+
+        self.start_room = maze_start.id
+        self.exit_room = maze_exit.id
+
         maze_stack = Stack()
         maze_stack.push(maze_start)
         # repeat until stack is empty
@@ -68,6 +74,7 @@ class Room(models.Model):
     maze = models.IntegerField(default=0)
 
     def __iter__(self):
+        yield 'id', int(self.id)
         yield 'n', int(self.north_connection)
         yield 'e', int(self.east_connection)
         yield 's', int(self.south_connection)
