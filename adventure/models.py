@@ -31,11 +31,12 @@ class Maze(models.Model):
                     room.maze = self.id
                     room.save()
 
-        return self.rooms()
+        return self.rooms(serialize=False)
 
-    def rooms(self):
+    def rooms(self, serialize=True):
         rooms = Room.objects.filter(maze=self.id)
-        return [[rooms[i].serialize() for i in range(j*32, (j+1)*32)] for j in range(32)]
+        def room(i): return rooms[i].serialize() if serialize else rooms[i]
+        return [[room(i) for i in range(j*32, (j+1)*32)] for j in range(32)]
 
     def generate_connections(self):
         rooms = self.initialize()
