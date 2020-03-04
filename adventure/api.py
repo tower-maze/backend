@@ -21,11 +21,18 @@ def initialize(request):
     uuid = player.uuid
     room = player.room()
     # players = room.playerNames(player_id)
-    return JsonResponse({'x': room.x, 'y': room.y, 'maze': room.maze}, safe=True)
+    return JsonResponse({'maze': room.maze, 'x': room.x, 'y': room.y}, safe=True)
 
 
 @csrf_exempt
 @api_view(['GET'])
+def get_maze(request):
+    maze = request.user.player.maze()
+    rooms = maze.rooms(callback=lambda room: dict(room))
+    return JsonResponse({'title': maze.title, 'rooms': rooms, 'startRoom': maze.start_room, 'exitRoom': maze.exit_room}, safe=True)
+
+
+@csrf_exempt
 def other_players(request):
     user = request.user
     player = user.player
@@ -33,7 +40,7 @@ def other_players(request):
     return JsonResponse({'other players': others})
 
 
-# @csrf_exempt
+@csrf_exempt
 @api_view(['POST'])
 def move(request):
     data = request.data
@@ -41,9 +48,9 @@ def move(request):
     player = request.user.player
     try:
         new_room = player.move(direction)
-        return JsonResponse({'x': new_room.x, 'y': new_room.y})
+        return JsonResponse({'maze': new_room.maze, 'x': new_room.x, 'y': new_room.y})
     except:
-        return JsonResponse({'message': 'Invalid Direction'}, status=400)
+        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 
 
 @csrf_exempt
