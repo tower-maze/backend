@@ -24,6 +24,15 @@ def initialize(request):
     return JsonResponse({'x': room.x, 'y': room.y, 'maze': room.maze}, safe=True)
 
 
+@csrf_exempt
+@api_view(['GET'])
+def other_players(request):
+    user = request.user
+    player = user.player
+    others = player.see_others()
+    return JsonResponse({'other players': others})
+
+
 # @csrf_exempt
 @api_view(['POST'])
 def move(request):
