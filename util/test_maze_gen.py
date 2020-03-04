@@ -2,5 +2,7 @@ from adventure.models import Maze
 
 maze = Maze()
 maze.title = "My First Maze"
-maze.generate_connections()
-maze.save()
+maze.initialize(8)
+for row in maze.rooms:
+    print(row)
+

@@ -15,7 +15,7 @@ class Maze(models.Model):
     seed = models.BinaryField(null=True)
     rooms = None
 
-    def initialize(self):
+    def initialize(self, n=32):
         """loads the maze rooms into memory, generating new rooms if seed is missing"""
         # [
         #     [Room(x=0,y=0), Room(x=1,y=0), ...],
@@ -26,16 +26,12 @@ class Maze(models.Model):
             self.save()
         if not self.rooms:
             # generate room objects O(n^2) n=32
-            self.rooms = [[None for i in range(32)] for j in range(32)]
-            for y in range(32):
-                for x in range(32):
-                    room = Room(x, y, self)
-                    self.rooms[y][x] = room
+            self.rooms = [[Room(x, y, self) for x in range(n)] for y in range(n)]
             if not self.exit_room or not self.start_room:
                 # select start and exit, save as (x,y) tuples
-                x, y = random.randint(0,31), 0
+                x, y = random.randint(0,n-1), 0
                 self.exit_room = bytes((x, y))
-                x, y = random.randint(0,31), 31
+                x, y = random.randint(0,n-1), n-1
                 self.start_room = bytes((x, y))
             # generate connections
             x, y = self.start_room
@@ -44,7 +40,7 @@ class Maze(models.Model):
             maze_stack.push(maze_start)
             seed = self.seed
             if not seed:
-                seed = bytearray(32*32)
+                seed = bytearray(n**2)
             i = 0
             # repeat until stack is empty O(n^2) n=32
             while len(maze_stack):
@@ -74,6 +70,8 @@ class Maze(models.Model):
         """return Room or None"""
         if not self.rooms:
             self.initialize()
+        if x < 0 or y < 0:
+            return None
         try:
             return self.rooms[y][x]
         except IndexError:
@@ -96,6 +94,14 @@ class Room():
         self.maze = maze
         for key in kwargs:
             setattr(self, key, kwargs[key])
+
+    def __repr__(self):
+        connections = 'R:'
+        if self.north_connection: connections += 'n'
+        if self.east_connection: connections += 'e'
+        if self.south_connection: connections += 's'
+        if self.west_connection: connections += 'w'
+        return connections
 
     def connect(self, room):
         if self.y > room.y:
