@@ -30,7 +30,7 @@ def other_players(request):
     user = request.user
     player = user.player
     others = player.see_others()
-    return JsonResponse({'other players': others})
+    return JsonResponse({'others': others})
 
 
 # @csrf_exempt
