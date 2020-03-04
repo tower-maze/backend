@@ -14,5 +14,4 @@ with transaction.atomic():
 
     players = Player.objects.all()
     for player in players:
-        player.current_room = Room.objects.first().id
-        player.save()
+        player.initialize()
