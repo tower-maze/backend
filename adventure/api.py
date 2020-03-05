@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-# from pusher import Pusher
+from pusher import Pusher
 from django.http import JsonResponse
 from decouple import config
 from django.contrib.auth.models import User
@@ -9,7 +9,8 @@ from rest_framework.decorators import api_view
 import json
 
 # instantiate pusher
-# pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
+pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config(
+    'PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
 
 
 @csrf_exempt
@@ -49,6 +50,10 @@ def move(request):
     data = request.data
     direction = data['direction']
     player = request.user.player
+    pusher.trigger('my-channel', 'my-event', {
+        'player': 'id',
+        'position': 'position'
+    })
     try:
         new_room = player.move(direction)
         return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
