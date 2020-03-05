@@ -15,17 +15,13 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.room()
-    # players = room.playerNames(player_id)
     return JsonResponse({'maze': room.maze.id, 'x': room.x, 'y': room.y}, safe=True)
 
 
 @api_view(['GET'])
 def get_maze(request):
-    maze = request.user.player.maze()
-    rooms = maze.get_rooms(callback=lambda room: dict(room))
-    start_room = dict(maze.get_room_by_id(maze.start_room))
-    exit_room = dict(maze.get_room_by_id(maze.exit_room))
-    return JsonResponse({'title': maze.title, 'rooms': rooms, 'startRoom': start_room, 'exitRoom': exit_room}, safe=True)
+    maze = dict(request.user.player.maze())
+    return JsonResponse(maze, safe=True)
 
 
 @api_view(['GET'])
@@ -38,12 +34,12 @@ def other_players(request):
 
 @api_view(['POST'])
 def move(request):
-    data = request.data
-    direction = data['direction']
     player = request.user.player
+    prev_maze = player.current_maze
     try:
-        new_room = player.move(direction)
-        return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
+        room = player.move(request.data['direction'])
+        maze = dict(player.maze()) if prev_maze != room.maze.id else None
+        return JsonResponse({'player': {'maze': room.maze.id, 'x': room.x, 'y': room.y}, 'nextMaze': maze}, safe=True)
     except:
         return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
 
