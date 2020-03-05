@@ -49,7 +49,7 @@ def move(request):
                        {'player': player.id,  **position})
         return JsonResponse({'player': {**position, 'maze': room.maze.id}, 'nextMaze': maze}, safe=True)
     except:
-        return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
+        return JsonResponse({'movement': 'Invalid Direction'}, safe=True, status=400)
 
 
 @api_view(['POST'])
