@@ -20,7 +20,6 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.room()
-    # players = room.playerNames(player_id)
     return JsonResponse({'maze': room.maze.id, 'x': room.x, 'y': room.y}, safe=True)
 
 
