@@ -45,10 +45,10 @@ def move(request):
         new_room = player.move(direction)
         return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
     except:
-        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
+        return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
 
 
 @api_view(['POST'])
 def say(request):
     # IMPLEMENT
-    return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)
+    return JsonResponse({'detail': 'Not yet implemented'}, safe=True, status=500)
