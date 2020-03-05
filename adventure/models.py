@@ -15,6 +15,12 @@ class Maze(models.Model):
     seed = models.CharField(max_length=1024, default='')
     rooms = None
 
+    def __iter__(self):
+        yield 'title', self.title
+        yield 'rooms', self.get_rooms(callback=lambda room: dict(room))
+        yield 'startRoom',  dict(self.get_room_by_id(self.start_room))
+        yield 'exitRoom', dict(self.get_room_by_id(self.exit_room))
+
     def initialize(self, n=32):
         """loads the maze rooms into memory, generating new rooms if seed is missing"""
         # [
@@ -167,6 +173,12 @@ class Player(models.Model):
     current_room = models.IntegerField(default=-1)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
+    def __iter__(self):
+        room = self.room()
+        yield 'player', self.id
+        yield 'x', room.x
+        yield 'y', room.y
+
     def initialize(self):
         first_maze = Maze.objects.first()
         self.current_maze = first_maze.id
@@ -191,6 +203,13 @@ class Player(models.Model):
 
     def set_room(self, room):
         self.current_room = room.id
+        maze = self.maze()
+        if self.current_room == maze.exit_room and self.current_maze != Maze.objects.last().id:
+            self.current_maze += 1
+            self.current_room = self.maze().start_room
+        elif self.current_room == maze.start_room and self.current_maze != Maze.objects.first().id:
+            self.current_maze -= 1
+            self.current_room = self.maze().exit_room
         self.save()
 
     def move(self, direction):
@@ -206,18 +225,12 @@ class Player(models.Model):
         else:
             raise Exception('Invalid Direction')
         self.set_room(new_room)
-        return new_room
+        return self.room()
 
     def see_others(self):
         players = Player.objects.filter(current_maze=self.current_maze)
         players = players.exclude(id=self.id)
-        player_cords = []
-        player_positions = []
-        for player in players:
-            position = {'x': player.room().x, 'y': player.room().y}
-            if not position in player_positions:
-                player_positions.append(position)
-
+        player_positions = [dict(player) for player in players]
         return player_positions
 
 
