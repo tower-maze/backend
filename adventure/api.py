@@ -46,7 +46,7 @@ def move(request):
         maze = dict(player.maze()) if prev_maze != room.maze.id else None
         position = {'x': room.x, 'y': room.y}
         pusher.trigger('Tower-Maze', 'movement',
-                       {'player': player.id, 'position': position})
+                       {'player': player.id,  **position})
         return JsonResponse({'player': {**position, 'maze': room.maze.id}, 'nextMaze': maze}, safe=True)
     except:
         return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
