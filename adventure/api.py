@@ -27,11 +27,8 @@ def initialize(request):
 @csrf_exempt
 @api_view(['GET'])
 def get_maze(request):
-    maze = request.user.player.maze()
-    rooms = maze.get_rooms(callback=lambda room: dict(room))
-    start_room = dict(maze.get_room_by_id(maze.start_room))
-    exit_room = dict(maze.get_room_by_id(maze.exit_room))
-    return JsonResponse({'title': maze.title, 'rooms': rooms, 'startRoom': start_room, 'exitRoom': exit_room}, safe=True)
+    maze = dict(request.user.player.maze())
+    return JsonResponse(maze, safe=True)
 
 
 @csrf_exempt
@@ -50,19 +47,12 @@ def move(request):
     direction = data['direction']
     player = request.user.player
     current_maze = player.current_maze
-    try:
-        new_room = player.move(direction)
-        if current_maze != player.current_maze:
-            maze = request.user.player.maze()
-            rooms = maze.get_rooms(callback=lambda room: dict(room))
-            start_room = dict(maze.get_room_by_id(maze.start_room))
-            exit_room = dict(maze.get_room_by_id(maze.exit_room))
-            next_maze =  {'title': maze.title, 'rooms': rooms, 'startRoom': start_room, 'exitRoom': exit_room}     
-            return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y},'next-maze': next_maze})
-        else:
-            return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y}})
-    except:
-        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
+    # try:
+    new_room = player.move(direction)
+    next_maze = dict(player.maze())  if current_maze != player.current_maze else None 
+    return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y},'nextMaze': next_maze})
+    # except:
+    #     return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 
 
 @csrf_exempt
@@ -70,3 +60,5 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)
+
+

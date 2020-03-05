@@ -15,6 +15,12 @@ class Maze(models.Model):
     seed = models.CharField(max_length=1024, default='')
     rooms = None
 
+    def __iter__(self):
+        yield 'title', self.title
+        yield 'rooms', self.get_rooms(callback=lambda room: dict(room))
+        yield 'startRoom',  dict(self.get_room_by_id(self.start_room))
+        yield 'exitRoom', dict(self.get_room_by_id(self.exit_room))
+
     def initialize(self, n=32):
         """loads the maze rooms into memory, generating new rooms if seed is missing"""
         # [
@@ -191,10 +197,11 @@ class Player(models.Model):
 
     def set_room(self, room):
         self.current_room = room.id
-        if self.current_room == self.current_maze.exit_room:
+        maze = self.maze()
+        if self.current_room == maze.exit_room:
             self.current_maze += 1
             self.current_room = self.maze().start_room
-        elif self.current_room == self.current_maze.start_room:
+        elif self.current_room == maze.start_room:
             if self.current_maze != Maze.objects.first().id:
                 self.current_maze -= 1
                 self.current_room = self.maze().exit_room
