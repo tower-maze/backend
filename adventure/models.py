@@ -26,12 +26,13 @@ class Maze(models.Model):
             self.save()
         if not self.rooms:
             # generate room objects O(n^2) n=32
-            self.rooms = [[Room(x, y, self) for x in range(n)] for y in range(n)]
+            self.rooms = [[Room(x, y, self) for x in range(n)]
+                          for y in range(n)]
             if not self.exit_room or not self.start_room:
                 # select start and exit, save as (x,y) tuples
-                x, y = random.randint(0,n-1), 0
+                x, y = random.randint(0, n-1), 0
                 self.exit_room = bytes((x, y))
-                x, y = random.randint(0,n-1), n-1
+                x, y = random.randint(0, n-1), n-1
                 self.start_room = bytes((x, y))
             # generate connections
             x, y = self.start_room
@@ -75,7 +76,7 @@ class Maze(models.Model):
             return [[callback(room) for room in row] for row in self.rooms]
 
     def get_room(self, x, y):
-        """return Room or None"""
+        """returns Room or None"""
         if not self.rooms:
             self.initialize()
         if x < 0 or y < 0:
@@ -142,7 +143,7 @@ class Room():
             if room:
                 return room.count_connections() == 0
             return False
-        
+
         return [*filter(is_available, rooms)]
 
     def get_room_north(self):
@@ -161,7 +162,7 @@ class Room():
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     current_maze = models.IntegerField(default=0)
-    current_room = models.BinaryField(default=bytes((0,0)))
+    current_room = models.BinaryField(default=bytes((0, 0)))
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def initialize(self):
