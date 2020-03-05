@@ -43,16 +43,14 @@ def other_players(request):
 @csrf_exempt
 @api_view(['POST'])
 def move(request):
-    data = request.data
-    direction = data['direction']
     player = request.user.player
-    current_maze = player.current_maze
-    # try:
-    new_room = player.move(direction)
-    next_maze = dict(player.maze())  if current_maze != player.current_maze else None 
-    return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y},'nextMaze': next_maze})
-    # except:
-    #     return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
+    prev_maze = player.current_maze
+    try:
+        room = player.move(request.data['direction'])
+        maze = dict(player.maze()) if prev_maze != room.maze.id else None
+        return JsonResponse({'player': {'maze': room.maze.id, 'x': room.x, 'y': room.y}, 'nextMaze': maze}, safe=True)
+    except:
+        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 
 
 @csrf_exempt
@@ -60,5 +58,3 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)
-
-
