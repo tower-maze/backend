@@ -51,10 +51,10 @@ def move(request):
     directions = ['n', 's', 'e', 'w']
     player = request.user.player
     for i in range(1, 101):
-        player.move('n')
-        player.move('s')
-        player.move('e')
-        player.move('w')
+        player.move(directions['n'])
+        player.move(directions['s'])
+        player.move(directions['e'])
+        player.move(directions['w'])
 
         try:
             new_room = player.move(direction)
