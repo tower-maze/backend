@@ -1,11 +1,16 @@
-# from pusher import Pusher
+from pusher import Pusher
 from django.http import JsonResponse
 from decouple import config
 from .models import *
 from rest_framework.decorators import api_view
 
 # instantiate pusher
-# pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
+pusher = Pusher(
+    app_id=config('PUSHER_APP_ID'),
+    key=config('PUSHER_KEY'),
+    secret=config('PUSHER_SECRET'),
+    cluster=config('PUSHER_CLUSTER')
+)
 
 
 @api_view(['GET'])
@@ -39,7 +44,10 @@ def move(request):
     try:
         room = player.move(request.data['direction'])
         maze = dict(player.maze()) if prev_maze != room.maze.id else None
-        return JsonResponse({'player': {'maze': room.maze.id, 'x': room.x, 'y': room.y}, 'nextMaze': maze}, safe=True)
+        position = {'x': room.x, 'y': room.y}
+        pusher.trigger('Tower-Maze', 'movement',
+                       {'player': player.id,  **position})
+        return JsonResponse({'player': {**position, 'maze': room.maze.id}, 'nextMaze': maze}, safe=True)
     except:
         return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
 
