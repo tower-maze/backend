@@ -1,17 +1,20 @@
+from django.db import transaction
 from django.contrib.auth.models import User
 from django.db import transaction
 from adventure.models import Player, Room, Maze
 
 Maze.objects.all().delete()
-Room.objects.all().delete()
+players = Player.objects.all()
 
 with transaction.atomic():
-    for i in range(1, 10):
+    for i in range(1, 101):
         maze = Maze()
-        maze.generate_connections()
         maze.title = f"Floor {i}"
-        maze.save()
+        maze.initialize()
+        if i == 1:
+            print('')
+        print(maze.title, 'created')
 
-    players = Player.objects.all()
+with transaction.atomic():
     for player in players:
         player.initialize()
