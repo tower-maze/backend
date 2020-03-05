@@ -48,12 +48,19 @@ def other_players(request):
 def move(request):
     data = request.data
     direction = data['direction']
+    directions = ['n', 's', 'e', 'w']
     player = request.user.player
-    try:
-        new_room = player.move(direction)
-        return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
-    except:
-        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
+    for i in range(1, 101):
+        player.move('n')
+        player.move('s')
+        player.move('e')
+        player.move('w')
+
+        try:
+            new_room = player.move(direction)
+            return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
+        except:
+            return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 
 
 @csrf_exempt
