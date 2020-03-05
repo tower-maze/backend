@@ -1,18 +1,13 @@
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 # from pusher import Pusher
 from django.http import JsonResponse
 from decouple import config
-from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
-import json
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
 
 
-@csrf_exempt
 @api_view(['GET'])
 def initialize(request):
     user = request.user
@@ -23,14 +18,12 @@ def initialize(request):
     return JsonResponse({'maze': room.maze.id, 'x': room.x, 'y': room.y}, safe=True)
 
 
-@csrf_exempt
 @api_view(['GET'])
 def get_maze(request):
     maze = dict(request.user.player.maze())
     return JsonResponse(maze, safe=True)
 
 
-@csrf_exempt
 @api_view(['GET'])
 def other_players(request):
     user = request.user
@@ -39,7 +32,6 @@ def other_players(request):
     return JsonResponse({'others': others})
 
 
-@csrf_exempt
 @api_view(['POST'])
 def move(request):
     player = request.user.player
@@ -49,11 +41,10 @@ def move(request):
         maze = dict(player.maze()) if prev_maze != room.maze.id else None
         return JsonResponse({'player': {'maze': room.maze.id, 'x': room.x, 'y': room.y}, 'nextMaze': maze}, safe=True)
     except:
-        return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
+        return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
 
 
-@csrf_exempt
 @api_view(['POST'])
 def say(request):
     # IMPLEMENT
-    return JsonResponse({'error': 'Not yet implemented'}, safe=True, status=500)
+    return JsonResponse({'detail': 'Not yet implemented'}, safe=True, status=500)
