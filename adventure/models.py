@@ -10,9 +10,9 @@ import random
 
 class Maze(models.Model):
     title = models.CharField(max_length=127, default="Default Title")
-    start_room = models.BinaryField(null=True)
-    exit_room = models.BinaryField(null=True)
-    seed = models.BinaryField(null=True)
+    start_room = models.IntegerField(default=-1)
+    exit_room = models.IntegerField(default=-1)
+    seed = models.CharField(max_length=1024, default='')
     rooms = None
 
     def initialize(self, n=32):
@@ -26,22 +26,21 @@ class Maze(models.Model):
             self.save()
         if not self.rooms:
             # generate room objects O(n^2) n=32
-            self.rooms = [[Room(x, y, self) for x in range(n)]
+            self.rooms = [[Room(x + n*y, x, y, self) for x in range(n)]
                           for y in range(n)]
-            if not self.exit_room or not self.start_room:
+            if self.exit_room < 0 or self.start_room < 0:
                 # select start and exit, save as (x,y) tuples
                 x, y = random.randint(0, n-1), 0
-                self.exit_room = bytes((x, y))
+                self.exit_room = x + n*y
                 x, y = random.randint(0, n-1), n-1
-                self.start_room = bytes((x, y))
+                self.start_room = x + n*y
             # generate connections
-            x, y = self.start_room
-            maze_start = self.rooms[y][x]
+            maze_start = self.get_room_by_id(self.start_room)
             maze_stack = Stack()
             maze_stack.push(maze_start)
             seed = self.seed
             if not seed:
-                seed = bytearray(n**2)
+                seed = ['0' for i in range(n**2)]
             i = 0
             # repeat until stack is empty O(n^2) n=32
             while len(maze_stack):
@@ -50,10 +49,10 @@ class Maze(models.Model):
                 available_rooms = room.get_available_rooms()
                 if len(available_rooms):
                     if self.seed:
-                        index = self.seed[i]
+                        index = int(self.seed[i])
                     else:
                         index = random.choice(range(len(available_rooms)))
-                        seed[i] = index
+                        seed[i] = str(index)
                     next_room = available_rooms[index]
                     # connect and add next room to stack
                     room.connect(next_room)
@@ -64,7 +63,7 @@ class Maze(models.Model):
                     maze_stack.pop()
             # save seed, start, and exit
             if not self.seed:
-                self.seed = seed
+                self.seed = ''.join(seed)
             self.save()
 
     def get_rooms(self, callback=None):
@@ -87,7 +86,10 @@ class Maze(models.Model):
             return None
 
     def get_room_by_id(self, room_id):
-        x, y = room_id
+        if not self.rooms:
+            self.initialize()
+        y = room_id // len(self.rooms)
+        x = room_id % len(self.rooms)
         return self.get_room(x, y)
 
 
@@ -97,8 +99,8 @@ class Room():
     south_connection = 0
     west_connection = 0
 
-    def __init__(self, x, y, maze, **kwargs):
-        self.id = bytes((x, y))
+    def __init__(self, n, x, y, maze, **kwargs):
+        self.id = n
         self.x = x
         self.y = y
         self.maze = maze
@@ -161,8 +163,8 @@ class Room():
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    current_maze = models.IntegerField(default=0)
-    current_room = models.BinaryField(default=bytes((0, 0)))
+    current_maze = models.IntegerField(default=-1)
+    current_room = models.IntegerField(default=-1)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def initialize(self):
