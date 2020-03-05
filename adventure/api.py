@@ -41,7 +41,7 @@ def move(request):
         maze = dict(player.maze()) if prev_maze != room.maze.id else None
         return JsonResponse({'player': {'maze': room.maze.id, 'x': room.x, 'y': room.y}, 'nextMaze': maze}, safe=True)
     except:
-        return JsonResponse({'detail': 'Invalid Direction'}, safe=True, status=400)
+        return JsonResponse({'movement': 'Invalid Direction'}, safe=True, status=400)
 
 
 @api_view(['POST'])
