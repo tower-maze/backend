@@ -49,9 +49,18 @@ def move(request):
     data = request.data
     direction = data['direction']
     player = request.user.player
+    current_maze = player.current_maze
     try:
         new_room = player.move(direction)
-        return JsonResponse({'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y})
+        if current_maze != player.current_maze:
+            maze = request.user.player.maze()
+            rooms = maze.get_rooms(callback=lambda room: dict(room))
+            start_room = dict(maze.get_room_by_id(maze.start_room))
+            exit_room = dict(maze.get_room_by_id(maze.exit_room))
+            next_maze =  {'title': maze.title, 'rooms': rooms, 'startRoom': start_room, 'exitRoom': exit_room}     
+            return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y},'next-maze': next_maze})
+        else:
+            return JsonResponse({'player':{'maze': new_room.maze.id, 'x': new_room.x, 'y': new_room.y}})
     except:
         return JsonResponse({'message': 'Invalid Direction'}, safe=True, status=400)
 
