@@ -7,7 +7,7 @@ Maze.objects.all().delete()
 players = Player.objects.all()
 
 with transaction.atomic():
-    for i in range(1, 101):
+    for i in range(1, 1001):
         maze = Maze()
         maze.title = f"Floor {i}"
         maze.initialize()
