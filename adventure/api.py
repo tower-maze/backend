@@ -20,7 +20,7 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.room()
-    return JsonResponse({'maze': room.maze.id, 'x': room.x, 'y': room.y}, safe=True)
+    return JsonResponse({'id': player.id, 'position': {'maze': room.maze.id, 'x': room.x, 'y': room.y}}, safe=True)
 
 
 @api_view(['GET'])
@@ -44,10 +44,10 @@ def move(request):
     try:
         room = player.move(request.data['direction'])
         maze = dict(player.maze()) if prev_maze != room.maze.id else None
-        position = {'x': room.x, 'y': room.y}
+        position = {'maze': room.maze.id, 'x': room.x, 'y': room.y}
         pusher.trigger('Tower-Maze', 'movement',
                        {'player': player.id,  **position})
-        return JsonResponse({'player': {**position, 'maze': room.maze.id}, 'nextMaze': maze}, safe=True)
+        return JsonResponse({'player': position, 'nextMaze': maze}, safe=True)
     except:
         return JsonResponse({'movement': 'Invalid Direction'}, safe=True, status=400)
 

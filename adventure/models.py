@@ -176,6 +176,7 @@ class Player(models.Model):
     def __iter__(self):
         room = self.room()
         yield 'player', self.id
+        yield 'maze', self.current_maze
         yield 'x', room.x
         yield 'y', room.y
 
